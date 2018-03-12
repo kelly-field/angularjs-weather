@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+		<script type="text/javascript" src="js/1.11.0.js"></script>
+		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/angular.min.js"></script>
+		<title>angularjs实例</title>
+	</head>
+
+	<body ng-app="weatherApp" ng-controller="showWeather">
+		<div>
+			<select ng-init="ctiyName = citylist[0]" ng-model="ctiyName" ng-options="y for y in citylist" ng-change="changeCity(ctiyName)">
+			</select>
+		</div>
+		<div>
+			<label>当前城市:{{city}}</label>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th scope="col">日期</th>
+						<th scope="col">最高温度</th>
+						<th scope="col">最低温度</th>
+						<th scope="col">风向</th>
+						<th scope="col">天气状况</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="x in names">
+						<th scope="row">{{x.date}}</th>
+						<td>{{x.high}}</td>
+						<td>{{x.low}}</td>
+						<td>{{x.fengxiang}}</td>
+						<td>{{x.type}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+	<script type="text/javascript">
+		//显示城市列表
+		var app = angular.module('weatherApp', []);
+		var weather_url = 'http://wthrcdn.etouch.cn/weather_mini?city=';
+		var def_city = '北京';
+		//初始化默认城市的天气
+		initWeather(weather_url, def_city);
+		//获取天气状况
+		function initWeather(weather_url, def_city) {
+			app.controller('showWeather', function($scope, $http) {
+				$scope.citylist = ["北京", "天津", "河北", "吉林", "上海", "河南", "海南", "重庆", "香港", "澳门"];
+				//改变城市的值时，重新获取天气数据
+				$scope.changeCity = function(x) {
+					def_city = x;
+					$http({
+						method: 'GET',
+						url: weather_url + def_city
+					}).then(function successCallback(response) {
+						$scope.names = response.data.data.forecast;
+						$scope.city = response.data.data.city;
+					}, function errorCallback(response) {
+						console.log('失败')
+					});
+				}
+				//初始化默认城市对应的天气
+				$http({
+					method: 'GET',
+					url: weather_url + def_city
+				}).then(function successCallback(response) {
+					$scope.names = response.data.data.forecast;
+					$scope.city = response.data.data.city;
+				}, function errorCallback(response) {
+					console.log('失败')
+				});
+			});
+		}
+		
+		//新歌榜
+		var newSongUrl = 'http://music.qq.com/musicbox/shop/v3/data/hit/hit_newsong.js';
+		//总榜
+		var totalSongUrl = 'http://music.qq.com/musicbox/shop/v3/data/hit/hit_all.js';
+	</script>
+
+</html>
